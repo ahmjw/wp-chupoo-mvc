@@ -2,7 +2,7 @@
     "name": "ahmjw/wp-chupoo-mvc",
     "description": "MVC framework for Wordpress",
     "homepage": "https://chupoo.introvesia.com",
-    "keywords": ["php", "dom", "view"],
+    "keywords": ["php", "dom", "wordpress", "mvc", "plugin", "framework"],
     "license": "Apache-2.0",
     "authors": [
         {

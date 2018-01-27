@@ -14,8 +14,8 @@
     "minimum-stability": "alpha",
     "require": {
         "php": ">=5.3",
-        "ahmjw/php-dom-view": "1.0.*",
-        "ahmjw/php-record-model": "1.0.*"
+        "ahmjw/php-dom-view": "dev-master",
+        "ahmjw/php-record-model": "dev-master"
     },
     "autoload": {
         "psr-4": {

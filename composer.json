@@ -11,7 +11,8 @@
             "homepage": "http://twitter.com/ahmjw"
         }
     ],
-    "minimum-stability": "alpha",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
         "php": ">=5.3",
         "ahmjw/php-dom-view": "1.0.*",

@@ -11,11 +11,11 @@
             "homepage": "http://twitter.com/ahmjw"
         }
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "alpha",
     "require": {
         "php": ">=5.3",
-        "ahmjw/php-dom-view": "dev-master",
-        "ahmjw/php-record-model": "dev-master"
+        "ahmjw/php-dom-view": "1.*",
+        "ahmjw/php-record-model": "1.*"
     },
     "autoload": {
         "psr-4": {

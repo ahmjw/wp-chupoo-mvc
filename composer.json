@@ -1,0 +1,24 @@
+{
+    "name": "ahmjw/wp-chupoo-mvc",
+    "description": "MVC framework for Wordpress",
+    "homepage": "https://chupoo.introvesia.com",
+    "keywords": ["php", "dom", "view"],
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Ahmad",
+            "email": "rawndummy@gmail.com",
+            "homepage": "http://twitter.com/ahmjw"
+        }
+    ],
+    "minimum-stability": "alpha",
+    "require": {
+        "php": ">=5.3",
+        "ahmjw/php-dom-view": "1.0.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Introvesia\\WpChupooMvc\\": "src"
+        }
+    }
+}

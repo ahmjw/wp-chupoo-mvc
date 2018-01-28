@@ -25,7 +25,6 @@ class Base
 		set_exception_handler(array($this, 'handleException'));
 		add_action( 'template_redirect', array($this, 'loadPublic') );
 		add_action( 'admin_menu', array($this, 'adminMenu') );
-		add_action( 'wp_loaded', array($this, 'pageLoaded') );
 	}
 
 	public function loadClass($className)
@@ -37,11 +36,6 @@ class Base
 	public function handleException($exc)
 	{
 		print_r($exc);
-	}
-
-	public function pageLoaded()
-	{
-		current_user_can('read');
 	}
 
 	public function adminMenu()
@@ -69,9 +63,9 @@ class Base
 	    if (isset($menu[3])) {
 	    	foreach ($menu[3] as $sub_route => $sub_menu) {
 	    		add_submenu_page(
-			    	null,
-			        $sub_menu[0],
-			        $sub_menu[1],
+			    	'c/' . $sub_route,
+			        $sub_menu,
+			        $sub_menu,
 			        'read',
 			        'c/' . $sub_route,
 			        array($this, 'loadAdmin'));
@@ -89,13 +83,19 @@ class Base
 
 		$view_dir = '/admin';
 		$page = substr($plugin_page, 2);
-		$view_name = $routing[$page];
+		$controller_path = get_template_directory() . '/modules/controllers' . $view_dir;
+		if (!isset($routing[$page])) {
+			if (file_exists($controller_path . '/' . $page . '.php')) {
+				$view_name = $page;
+			}
+		} else {
+			$view_name = $routing[$page];
+		}
 
 		ViewConfig::setData('view_dir', get_template_directory() . '/modules/views' . $view_dir);
 		ViewConfig::setData('layout_dir', get_template_directory() . '/modules/layouts/admin');
 
-		$controller_path = get_template_directory() . '/modules/controllers' . $view_dir . '/' . $view_name . '.php';
-		$data = require($controller_path);
+		$data = require($controller_path . '/' . $view_name . '.php');
 
 		$view = new View($view_name, $data);
 		$view->setSeparateAssets(false);

@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Japan, Gunma-ken, Maebashi-shi, January 27th 2018
+ * @link http://chupoo.introvesia.com
+ * @author Ahmad <rawndummy@gmail.com>
+ */
 namespace Introvesia\WpChupooMvc;
 
 use Introvesia\PhpDomView\Layout;
@@ -9,6 +14,9 @@ use Introvesia\Chupoo\Models\Db;
 
 class Base
 {
+	private $route;
+	private $args = array();
+
 	public function run()
 	{
 		global $wpdb;
@@ -29,8 +37,10 @@ class Base
 
 	public function loadClass($className)
 	{
-		$path = get_template_directory() . '/modules/models/' . substr($className, 7) . '.php';
-		include($path);
+		if (preg_match('/^\\Models\\\\.*?$/', $className)) {
+			$path = get_template_directory() . '/modules/models/' . substr($className, 7) . '.php';
+			include($path);
+		}
 	}
 
 	public function handleException($exc)
@@ -40,61 +50,87 @@ class Base
 
 	public function adminMenu()
 	{
-	  current_user_can('read');
-	  $menus = require(get_template_directory() . '/modules/config/admin_menu.php');
-	  foreach ($menus as $route => $menu) {
-	    add_menu_page(
-	    	$menu[0], 
-	    	$menu[1], 
-	    	'read', 
-	    	'c/' . $route,
-	    	array($this, 'loadAdmin'));
-	    if (isset($menu[2])) {
-	    	foreach ($menu[2] as $sub_route => $sub_menu) {
-	    		add_submenu_page(
-			    	'c/' . $route,
-			        $sub_menu[0],
-			        $sub_menu[1],
-			        'read',
-			        'c/' . $sub_route,
-			        array($this, 'loadAdmin'));
-	    	}
-	    }
-	    if (isset($menu[3])) {
-	    	foreach ($menu[3] as $sub_route => $sub_menu) {
-	    		add_submenu_page(
-			    	'c/' . $sub_route,
-			        $sub_menu,
-			        $sub_menu,
-			        'read',
-			        'c/' . $sub_route,
-			        array($this, 'loadAdmin'));
-	    	}
-	    }
-	  }
+		global $plugin_page;
+		$page = substr($plugin_page, 2);
+	  	$menus = require(get_template_directory() . '/modules/config/admin_menu.php');
+		// Routing
+		$route_list = require(get_template_directory() . '/modules/config/admin_routes.php');
+		$router = new Router($page);
+		$router->parse($route_list);
+		$this->route = $router->getRoute();
+		$this->args = $router->getArgKeyValue();
+
+		foreach ($menus as $route => $menu) {
+			if ($route == $this->route) {
+				$slug = 'c/' . $page;
+			} else {
+				$slug = 'c/' . $route;
+			}
+			add_menu_page(
+				$menu[0], 
+				$menu[1], 
+				'read', 
+				$slug,
+				array($this, 'loadAdmin'));
+			if (isset($menu[2])) {
+				foreach ($menu[2] as $sub_route => $sub_menu) {
+					if ($sub_route == $this->route) {
+						$slug = 'c/' . $page;
+					} else {
+						$slug = 'c/' . $sub_route;
+					}
+					add_submenu_page(
+						'c/' . $route,
+						$sub_menu[0],
+						$sub_menu[1],
+						'read',
+						$slug,
+						array($this, 'loadAdmin'));
+				}
+			}
+			if (isset($menu[3])) {
+				foreach ($menu[3] as $sub_route => $sub_menu) {
+					if ($sub_route == $this->route) {
+						$slug = 'c/' . $page;
+					} else {
+						$slug = 'c/' . $sub_route;
+					}
+					add_submenu_page(
+						'c/' . $sub_route,
+						$sub_menu,
+						$sub_menu,
+						'read',
+						$slug,
+						array($this, 'loadAdmin'));
+				}
+			}
+		}
 	}
 
 	public function loadAdmin()
 	{
 		global $plugin_page;
 
-		$routing = require(get_template_directory() . '/modules/config/admin_routes.php');
-		$args = array();
-
 		$view_dir = '/admin';
 		$page = substr($plugin_page, 2);
+
 		$controller_path = get_template_directory() . '/modules/controllers' . $view_dir;
-		if (!isset($routing[$page])) {
+		if (!isset($route_list[$page])) {
 			if (file_exists($controller_path . '/' . $page . '.php')) {
 				$view_name = $page;
+			} else if (!empty($this->route)) {
+				$view_name = $this->route;
 			}
 		} else {
-			$view_name = $routing[$page];
+			$view_name = $route_list[$page];
 		}
 
 		ViewConfig::setData('view_dir', get_template_directory() . '/modules/views' . $view_dir);
 		ViewConfig::setData('layout_dir', get_template_directory() . '/modules/layouts/admin');
 
+		if (!empty($this->args)) {
+			extract($this->args);
+		}
 		$data = require($controller_path . '/' . $view_name . '.php');
 
 		$view = new View($view_name, $data);
@@ -105,7 +141,7 @@ class Base
 
 	public function loadPublic()
 	{
-	  $routing = require(get_template_directory() . '/modules/config/public_routes.php');
+	  $route_list = require(get_template_directory() . '/modules/config/public_routes.php');
 
 	  $uri_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 	  $uri_segments = explode('/', $uri_path);
@@ -115,9 +151,9 @@ class Base
 	  
 	  if (!empty($uri_segments[2])) {
 	      $uri = implode('/', array_slice($uri_segments, 2));
-	      if (isset($routing[$uri])) {
+	      if (isset($route_list[$uri])) {
 	        $view_dir = '';
-	        $view_name = $routing[$uri];
+	        $view_name = $route_list[$uri];
 	        $args = array_slice($uri_segments, 2);
 	      } else {
 	        $last_index = count($uri_segments) - 1;

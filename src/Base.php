@@ -9,19 +9,35 @@ namespace Introvesia\WpChupooMvc;
 
 use Introvesia\PhpDomView\Layout;
 use Introvesia\PhpDomView\View;
-use Introvesia\PhpDomView\Config as ViewConfig;
+use Introvesia\PhpDomView\Config;
 use Introvesia\Chupoo\Models\Db;
 
 class Base
 {
+	/**
+     * Matched route
+     *
+     * @var string
+     */
 	private $route;
+
+	/**
+     * Matched route's arguments
+     *
+     * @var array
+     */
 	private $args = array();
 
+	/**
+     * Run MVC loader
+     *
+     * @return null
+     */
 	public function run()
 	{
 		global $wpdb;
 
-		ViewConfig::setData(array(
+		Config::setData(array(
 			'base_url' => get_home_url(),
 			'layout_dir' => get_template_directory() . '/modules/layouts',
 			'layout_url' => get_template_directory_uri(),
@@ -35,6 +51,12 @@ class Base
 		add_action( 'admin_menu', array($this, 'adminMenu') );
 	}
 
+	/**
+     * Model class autoloading
+     *
+     * @param string $className Model class name
+     * @return null
+     */
 	public function loadClass($className)
 	{
 		if (preg_match('/^\\Models\\\\.*?$/', $className)) {
@@ -43,11 +65,22 @@ class Base
 		}
 	}
 
+	/**
+     * Show caught error
+     *
+     * @param object $exc Exception information
+     * @return null
+     */
 	public function handleException($exc)
 	{
 		print_r($exc);
 	}
 
+	/**
+     * Load admin page menu
+     *
+     * @return null
+     */
 	public function adminMenu()
 	{
 		global $plugin_page;
@@ -107,6 +140,11 @@ class Base
 		}
 	}
 
+	/**
+     * Admin page loader
+     *
+     * @return null
+     */
 	public function loadAdmin()
 	{
 		global $plugin_page;
@@ -125,8 +163,8 @@ class Base
 			$view_name = $route_list[$page];
 		}
 
-		ViewConfig::setData('view_dir', get_template_directory() . '/modules/views' . $view_dir);
-		ViewConfig::setData('layout_dir', get_template_directory() . '/modules/layouts/admin');
+		Config::setData('view_dir', get_template_directory() . '/modules/views' . $view_dir);
+		Config::setData('layout_dir', get_template_directory() . '/modules/layouts/admin');
 
 		if (!empty($this->args)) {
 			extract($this->args);
@@ -139,6 +177,11 @@ class Base
 		print $view->getOutput();
 	}
 
+	/**
+     * Public page loader
+     *
+     * @return null
+     */
 	public function loadPublic()
 	{
 	  $route_list = require(get_template_directory() . '/modules/config/public_routes.php');
@@ -166,7 +209,7 @@ class Base
 	  }
 
 		if (!preg_match('/^(.*?)\..*?$/', $view_name) && $status_code == 200) {
-			ViewConfig::setData('view_dir', get_template_directory() . '/modules/views' . $view_dir);
+			Config::setData('view_dir', get_template_directory() . '/modules/views' . $view_dir);
 			$controller_path = get_template_directory() . '/modules/controllers' . $view_dir . '/' . $view_name . '.php';
 			$data = require($controller_path);
 

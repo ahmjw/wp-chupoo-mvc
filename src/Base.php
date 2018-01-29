@@ -2,9 +2,11 @@
 
 /**
  * Japan, Gunma-ken, Maebashi-shi, January 27th 2018
+ *
  * @link http://chupoo.introvesia.com
  * @author Ahmad <rawndummy@gmail.com>
  */
+
 namespace Introvesia\WpChupooMvc;
 
 use Introvesia\PhpDomView\Layout;
@@ -12,6 +14,12 @@ use Introvesia\PhpDomView\View;
 use Introvesia\PhpDomView\Config;
 use Introvesia\Chupoo\Models\Db;
 
+/**
+ * @package    Introvesia
+ * @subpackage WpChupooMvc
+ * @copyright  Copyright (c) 2016-2018 Introvesia (http://chupoo.introvesia.com)
+ * @version    v1.0.0
+ */
 class Base
 {
 	/**

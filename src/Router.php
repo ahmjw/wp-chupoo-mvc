@@ -1,12 +1,19 @@
 <?php
-
 /**
  * Japan, Gunma-ken, Maebashi-shi, January 28th 2018
+ *
  * @link http://chupoo.introvesia.com
  * @author Ahmad <rawndummy@gmail.com>
  */
+
 namespace Introvesia\WpChupooMvc;
 
+/**
+ * @package    Introvesia
+ * @subpackage WpChupooMvc
+ * @copyright  Copyright (c) 2016-2018 Introvesia (http://chupoo.introvesia.com)
+ * @version    v1.0.0
+ */
 class Router
 {
     /**
